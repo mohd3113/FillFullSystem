@@ -1,0 +1,95 @@
+﻿@model FillFull.Models.StartWorkViewModel
+@{
+    /**/
+
+    ViewBag.Title = "StartWork";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>StartWork</h2>
+<hr />
+
+@using (Html.BeginForm("StartWork", "Waiters", FormMethod.Post))
+{
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    Current Shift
+                </div>
+
+                @Html.AntiForgeryToken()
+                @Html.HiddenFor(model => model.WaiterID)
+                <div class="card-body">
+                    @if (Model.WorkStartID == 0)
+                    {
+                        <div class="alert alert-danger alert-dismissible" role="alert">
+                            <div class="alert-message">
+                                <strong>No Runing Shift: </strong>Press start button to start new shift
+                            </div>
+                        </div>
+                        <input type="submit" id="Startchat" value="Start" class="btn btn-success" /><br />
+                    }
+                    else
+                    {
+                        <div class="row">
+                            <div class="col-12 col-md-6 col-xl d-flex">
+                                <div class="card flex-fill">
+                                    <div class="card-body py-4">
+                                        <div class="media">
+                                            <div class="d-inline-block mt-2 mr-3">
+                                                <i class="feather-lg text-primary" data-feather="clock"></i>
+                                            </div>
+                                            <div class="media-body">
+                                                <h3 class="mb-2">@string.Format("{0:00}:{1:00}", (int)Model.Total_Hour, (int)Model.TotalMin)</h3>
+                                                <div class="mb-0">Hours</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-12 col-sm-6 col-xl d-flex">
+                                <div class="card flex-fill">
+                                    <div class="card-body py-4">
+                                        <div class="media">
+                                            <div class="d-inline-block mt-2 mr-3">
+                                                <i class="fa fa-percent fa-2x"></i>
+                                            </div>
+                                            <div class="media-body">
+                                                <h3 class="mb-2">£ @Model.Total_Wage.ToString("0.00")</h3>
+                                                <div class="mb-0">Wage</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    }
+                </div>
+
+            </div>
+        </div>
+    </div>
+}
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", function (event) {
+            $('.detcusbtn').click(function (e) {
+                e.preventDefault();
+                var id1 = this.value;
+                $.ajax({
+                    url: "/Admins/CustomerAjaxDe",
+                    type: "GET",
+                    data: { id: id1 },
+                    success: function (response) {
+                        $('#cusomerde').html(response);
+                    },
+                    error: function () {
+                        alert("An error has occured!!!");
+                    }
+                });
+            });
+        });
+    </script>
+}

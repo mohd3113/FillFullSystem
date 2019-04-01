@@ -1,0 +1,324 @@
+﻿@{
+    ViewBag.Title = "Home Page";
+}
+
+<h2>Dashboard</h2>
+<hr />
+<div class="row">
+    <div class="col-12 col-sm-6 col-xl d-flex">
+        <div class="card flex-fill">
+            <div class="card-body py-4">
+                <div class="media">
+                    <div class="d-inline-block mt-2 mr-3">
+                        <i class="feather-lg text-primary" data-feather="clock"></i>
+                    </div>
+                    <div class="media-body">
+                        <h3 class="mb-2">15:30</h3>
+                        <div class="mb-0">Working Hours Today</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-12 col-sm-6 col-xl d-flex">
+        <div class="card flex-fill">
+            <div class="card-body py-4">
+                <div class="media">
+                    <div class="d-inline-block mt-2 mr-3">
+                        <i class="feather-lg text-warning" data-feather="percent"></i>
+                    </div>
+                    <div class="media-body">
+                        <h3 class="mb-2">€ 150.5</h3>
+                        <div class="mb-0">Staff Payments Today</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-12 col-sm-6 col-xl d-flex">
+        <div class="card flex-fill">
+            <div class="card-body py-4">
+                <div class="media">
+                    <div class="d-inline-block mt-2 mr-3">
+                        <i class="feather-lg text-success" data-feather="dollar-sign"></i>
+                    </div>
+                    <div class="media-body">
+                        <h3 class="mb-2">4:30 Hours</h3>
+                        <div class="mb-0">Working Breaks Today</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-12 col-sm-6 col-xl d-none d-xxl-flex">
+        <div class="card flex-fill">
+            <div class="card-body py-4">
+                <div class="media">
+                    <div class="d-inline-block mt-2 mr-3">
+                        <i class="feather-lg text-info" data-feather="dollar-sign"></i>
+                    </div>
+                    <div class="media-body">
+                        <h3 class="mb-2">$ 18.700</h3>
+                        <div class="mb-0">Total Revenue</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12 col-lg-8 d-flex">
+        <div class="card flex-fill w-100">
+            <div class="card-header">
+                <span class="badge badge-primary float-right">Monthly</span>
+                <h5 class="card-title mb-0">Total staff Payments / working hours</h5>
+            </div>
+            <div class="card-body">
+                <div class="chart chart-lg">
+                    <canvas id="chartjs-dashboard-line"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            document.addEventListener("DOMContentLoaded", function (event) {
+                // Line chart
+                new Chart(document.getElementById("chartjs-dashboard-line"), {
+                    type: 'line',
+                    data: {
+                        labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+                        datasets: [{
+                            label: "Payments (€)",
+                            fill: true,
+                            backgroundColor: "transparent",
+                            borderColor: "#47BAC1",
+                            data: [2015, 1465, 1487, 1796, 1387, 2123, 2866, 2548, 3902, 4938, 3917, 4927]
+                        }, {
+                            label: "Hours",
+                            fill: true,
+                            backgroundColor: "transparent",
+                            borderColor: "#5fc27e",
+                            borderDash: [4, 4],
+                            data: [928, 734, 626, 893, 921, 1202, 1396, 1232, 1524, 2102, 1506, 1887]
+                        }]
+                    },
+                    options: {
+                        maintainAspectRatio: false,
+                        legend: {
+                            display: false
+                        },
+                        tooltips: {
+                            intersect: false
+                        },
+                        hover: {
+                            intersect: true
+                        },
+                        plugins: {
+                            filler: {
+                                propagate: false
+                            }
+                        },
+                        scales: {
+                            xAxes: [{
+                                reverse: true,
+                                gridLines: {
+                                    color: "rgba(0,0,0,0.05)"
+                                }
+                            }],
+                            yAxes: [{
+                                ticks: {
+                                    stepSize: 500
+                                },
+                                display: true,
+                                borderDash: [5, 5],
+                                gridLines: {
+                                    color: "rgba(0,0,0,0)",
+                                    fontColor: "#fff"
+                                }
+                            }]
+                        }
+                    }
+                });
+            });
+        </script>
+    </div>
+    <div class="col-12 col-lg-4 d-flex">
+        <div class="card flex-fill w-100">
+            <div class="card-header">
+                <span class="badge badge-info float-right">Today</span>
+                <h5 class="card-title mb-0">Recent Staff Activity</h5>
+            </div>
+            <div class="card-body">
+                <div class="media">
+                    <img src="~/Images/download.png" width="36" height="36" class="rounded-circle mr-2">
+                    <div class="media-body">
+                        <small class="float-right text-navy">7:51 pm</small>
+                        <strong>Ashley Briggs</strong> started new shift <strong>At</strong><br />
+                        <small class="text-muted">Total Hours 5:30 Hours</small><br />
+                    </div>
+                </div>
+                <hr />
+                <div class="media">
+                    <img src="~/Images/download.png" width="36" height="36" class="rounded-circle mr-2">
+                    <div class="media-body">
+                        <small class="float-right text-navy">7:51 pm</small>
+                        <strong>Ashley Briggs</strong> started a break <strong>At</strong><br />
+                        <small class="text-muted">Total Hours 2:30 Hours</small><br />
+                    </div>
+                </div>
+                <hr />
+                <div class="media">
+                    <img src="~/Images/download.png" width="36" height="36" class="rounded-circle mr-2">
+                    <div class="media-body">
+                        <small class="float-right text-navy">7:51 pm</small>
+                        <strong>Ashley Briggs</strong>ended his shift <strong>At</strong><br />
+                        <small class="text-muted">Total shift Hours 5:30 Hours, Total Payment: €15.00</small><br />
+                    </div>
+                </div>
+                <hr />
+                <a href="#" class="btn btn-primary btn-block">Load more</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12 col-lg-6 col-xl-6 d-flex">
+        <div class="card flex-fill w-100">
+            <div class="card-header">          
+                <h5 class="card-title mb-0">Working Hours / Payments</h5>
+            </div>
+            <div class="card-body d-flex w-100">
+                <div class="align-self-center chart chart-lg">
+                    <canvas id="chartjs-dashboard-bar"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            document.addEventListener("DOMContentLoaded", function (event) {
+                // Bar chart
+                new Chart(document.getElementById("chartjs-dashboard-bar"), {
+                    type: 'bar',
+                    data: {
+                        labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+                        datasets: [{
+                            label: "Last year",
+                            backgroundColor: "#47BAC1",
+                            borderColor: "#47BAC1",
+                            hoverBackgroundColor: "#47BAC1",
+                            hoverBorderColor: "#47BAC1",
+                            data: [54, 67, 41, 55, 62, 45, 55, 73, 60, 76, 48, 79]
+                        }, {
+                            label: "This year",
+                            backgroundColor: "#E8EAED",
+                            borderColor: "#E8EAED",
+                            hoverBackgroundColor: "#E8EAED",
+                            hoverBorderColor: "#E8EAED",
+                            data: [69, 66, 24, 48, 52, 51, 44, 53, 62, 79, 51, 68]
+                        }]
+                    },
+                    options: {
+                        maintainAspectRatio: false,
+                        legend: {
+                            display: false
+                        },
+                        scales: {
+                            yAxes: [{
+                                gridLines: {
+                                    display: false
+                                },
+                                stacked: false,
+                                ticks: {
+                                    stepSize: 20
+                                }
+                            }],
+                            xAxes: [{
+                                barPercentage: .75,
+                                categoryPercentage: .5,
+                                stacked: false,
+                                gridLines: {
+                                    color: "transparent"
+                                }
+                            }]
+                        }
+                    }
+                });
+            });
+        </script>
+    </div>
+    <div class="col-12 col-xl-6 d-none d-xl-flex">
+        <div class="card flex-fill w-100">
+            <div class="card-header">   
+                <h5 class="card-title mb-0">Weekly top 5 worker productivity</h5>
+            </div>
+            <div class="card-body d-flex">
+                <div class="align-self-center w-100">
+                    <div class="py-3">
+                        <div class="chart chart-xs">
+                            <canvas id="chartjs-dashboard-pie"></canvas>
+                        </div>
+                    </div>
+
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Worker</th>
+                                <th class="text-right">Hours</th>
+                                <th class="text-right">Value</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><i class="fas fa-square-full text-primary"></i> Mohammad</td>
+                                <td class="text-right">70</td>
+                                <td class="text-right text-success">+43%</td>
+                            </tr>
+                            <tr>
+                                <td><i class="fas fa-square-full text-warning"></i> Ahmad</td>
+                                <td class="text-right">65</td>
+                                <td class="text-right text-success">+13%</td>
+                            </tr>
+                            <tr>
+                                <td><i class="fas fa-square-full text-danger"></i> Mahmoud</td>
+                                <td class="text-right">60</td>
+                                <td class="text-right text-success">+24%</td>
+                            </tr>
+                            <tr>
+                                <td><i class="fas fa-square-full text-dark"></i> Shadi</td>
+                                <td class="text-right">50</td>
+                                <td class="text-right text-success">+11%</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            document.addEventListener("DOMContentLoaded", function (event) {
+                // Pie chart
+                new Chart(document.getElementById("chartjs-dashboard-pie"), {
+                    type: 'pie',
+                    data: {
+                        labels: ["Direct", "Affiliate", "E-mail", "Other"],
+                        datasets: [{
+                            data: [2602, 1253, 541, 1465],
+                            backgroundColor: ["#47BAC1", "#fcc100", "#f44455", "#E8EAED"],
+                            borderColor: "transparent"
+                        }]
+                    },
+                    options: {
+                        responsive: !window.MSInputMethodContext,
+                        maintainAspectRatio: false,
+                        legend: {
+                            display: false
+                        }
+                    }
+                });
+            });
+        </script>
+    </div>
+</div>
+
