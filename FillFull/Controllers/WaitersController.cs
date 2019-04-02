@@ -87,13 +87,13 @@ namespace FillFull.Controllers
                     WorkStartID = ifstillworking.WaiterWorkID,
                     Start = ifstillworking.StartAt
                 };
-                if(ifstillworking.WaiterBreaks != null)
+                if (ifstillworking.WaiterBreaks != null)
                 {
                     startmodel.waiterBreaks = ifstillworking.WaiterBreaks.ToList();
                 }
-                var employeeentrytime = startmodel.Start.Value.ToShortTimeString().ToString();
-                startmodel.Total_Hour = DateTime.Parse(DateTime.Now.ToShortTimeString()).Subtract(DateTime.Parse(employeeentrytime)).TotalHours;
-                startmodel.TotalMin = DateTime.Parse(DateTime.Now.ToShortTimeString()).Subtract(DateTime.Parse(employeeentrytime)).TotalMinutes;
+
+                startmodel.Total_Hour = (DateTime.Now - startmodel.Start.Value).TotalHours;
+                startmodel.TotalMin = (DateTime.Now - startmodel.Start.Value).TotalMinutes;
                 startmodel.Total_Wage = Convert.ToDecimal(startmodel.Total_Hour) * wa.Wage;
                 //var employeeexittime = employee.Posta.End.ToShortTimeString().ToString();
             }
@@ -119,11 +119,30 @@ namespace FillFull.Controllers
                 startWorkViewModel.WorkStartID = waiterWork.WaiterWorkID;
                 var employeeentrytime = startWorkViewModel.Start.Value.ToShortTimeString().ToString();
                 startWorkViewModel.Total_Hour = DateTime.Parse(DateTime.Now.ToShortTimeString()).Subtract(DateTime.Parse(employeeentrytime)).TotalHours;
-                startWorkViewModel.Total_Wage = Convert.ToDecimal(startWorkViewModel.Total_Wage) * db.Waiters.SingleOrDefault(p=>p.WaiterID == startWorkViewModel.WaiterID).Wage;
+                startWorkViewModel.Total_Wage = Convert.ToDecimal(startWorkViewModel.Total_Wage) * db.Waiters.SingleOrDefault(p => p.WaiterID == startWorkViewModel.WaiterID).Wage;
                 return View(startWorkViewModel);
             }
             return View(startWorkViewModel);
         }
+
+        [HttpPost]
+        public ActionResult EndShift(int? shiftid)
+        {
+            if (shiftid == null)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+            }
+            var runingshift = db.WaiterWorks.SingleOrDefault(p => p.WaiterWorkID == shiftid);
+            if (runingshift == null)
+            {
+                return HttpNotFound();
+            }
+            runingshift.IsClosed = true;
+            runingshift.EndAt = DateTime.Now;
+            db.SaveChanges();
+            return Json(new { id1 = runingshift.WaiterID }, JsonRequestBehavior.AllowGet);
+        }
+
 
         // POST: Waiters/Create
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 

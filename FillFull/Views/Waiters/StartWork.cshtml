@@ -6,7 +6,7 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h2>StartWork</h2>
+<h2>Shifs</h2>
 <hr />
 
 @using (Html.BeginForm("StartWork", "Waiters", FormMethod.Post))
@@ -28,7 +28,7 @@
                                 <strong>No Runing Shift: </strong>Press start button to start new shift
                             </div>
                         </div>
-                        <input type="submit" id="Startchat" value="Start" class="btn btn-success" /><br />
+                        <input type="submit" value="Start" class="btn btn-success" /><br />
                     }
                     else
                     {
@@ -41,7 +41,7 @@
                                                 <i class="feather-lg text-primary" data-feather="clock"></i>
                                             </div>
                                             <div class="media-body">
-                                                <h3 class="mb-2">@string.Format("{0:00}:{1:00}", (int)Model.Total_Hour, (int)Model.TotalMin)</h3>
+                                                <h3 class="mb-2">@TimeSpan.FromMinutes(Model.TotalMin).ToString(@"hh\:mm")</h3>
                                                 <div class="mb-0">Hours</div>
                                             </div>
                                         </div>
@@ -64,6 +64,16 @@
                                 </div>
                             </div>
                         </div>
+                        <div class="row">
+                            <div class="col-md-6 col-xs-12">
+                                <input type="button" id="Breakwork" value="Break" class="btn btn-warning btn-lg" style="width:100%" /><br />
+                            </div>
+                            <br class="hidden-md" />
+                            <br class="hidden-md" />
+                            <div class="col-md-6 col-xs-12">
+                                <input type="button" id="Endshift" value="End" class="btn btn-danger btn-lg" style="width:100%" /><br />
+                            </div>
+                        </div>
 
                     }
                 </div>
@@ -75,16 +85,16 @@
 @section Scripts {
     <script>
         document.addEventListener("DOMContentLoaded", function (event) {
-            $('.detcusbtn').click(function (e) {
+            $('#Endshift').click(function (e) {
                 e.preventDefault();
-                var id1 = this.value;
+                var id1 = @Model.WorkStartID;
                 $.ajax({
-                    url: "/Admins/CustomerAjaxDe",
-                    type: "GET",
-                    data: { id: id1 },
+                    url: "/Waiters/EndShift",
+                    type: "Post",
+                    data: { shiftid: id1 },
                     success: function (response) {
-                        $('#cusomerde').html(response);
-                    },
+                        window.location.href = '/Waiters/StartWork?id=' + response.id1 + '';
+                        },
                     error: function () {
                         alert("An error has occured!!!");
                     }
