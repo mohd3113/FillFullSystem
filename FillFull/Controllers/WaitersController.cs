@@ -92,10 +92,21 @@ namespace FillFull.Controllers
                     startmodel.waiterBreaks = ifstillworking.WaiterBreaks.ToList();
                 }
 
-                startmodel.Total_Hour = (DateTime.Now - startmodel.Start.Value).TotalHours;
-                startmodel.TotalMin = (DateTime.Now - startmodel.Start.Value).TotalMinutes;
-                startmodel.Total_Wage = Convert.ToDecimal(startmodel.Total_Hour) * wa.Wage;
-                //var employeeexittime = employee.Posta.End.ToShortTimeString().ToString();
+                var totalmin = (DateTime.Now - startmodel.Start.Value).TotalMinutes;
+                if (wa.MaxWorkingHours != 0)
+                {
+                    if (totalmin > wa.MaxWorkingHours * 60)
+                    {
+                        startmodel.TotalMin = wa.MaxWorkingHours * 60;
+                        startmodel.TotalExtaMin = totalmin - startmodel.TotalMin;
+                        startmodel.Total_Wage = Convert.ToDecimal(startmodel.TotalMin / 60) * wa.Wage;
+                        startmodel.ExtraTimeWage = Convert.ToDecimal(startmodel.TotalExtaMin / 60) * wa.WageafterMaxHours;
+                        return View(startmodel);
+                    }
+
+                }
+                startmodel.TotalMin = totalmin;
+                startmodel.Total_Wage = Convert.ToDecimal(startmodel.TotalMin / 60) * wa.Wage;      
             }
             return View(startmodel);
         }
@@ -117,9 +128,9 @@ namespace FillFull.Controllers
                 startWorkViewModel.Start = waiterWork.StartAt;
                 //startWorkViewModel.waiterBreaks = waiterWork.WaiterBreaks.ToList();
                 startWorkViewModel.WorkStartID = waiterWork.WaiterWorkID;
-                var employeeentrytime = startWorkViewModel.Start.Value.ToShortTimeString().ToString();
-                startWorkViewModel.Total_Hour = DateTime.Parse(DateTime.Now.ToShortTimeString()).Subtract(DateTime.Parse(employeeentrytime)).TotalHours;
-                startWorkViewModel.Total_Wage = Convert.ToDecimal(startWorkViewModel.Total_Wage) * db.Waiters.SingleOrDefault(p => p.WaiterID == startWorkViewModel.WaiterID).Wage;
+                var employeeentrytime = startWorkViewModel.Start.Value;
+                startWorkViewModel.Total_Hour = 0;
+                startWorkViewModel.Total_Wage = 0;
                 return View(startWorkViewModel);
             }
             return View(startWorkViewModel);
@@ -137,7 +148,21 @@ namespace FillFull.Controllers
             {
                 return HttpNotFound();
             }
+            var wa = db.Waiters.SingleOrDefault(p => p.WaiterID == runingshift.WaiterID);
+            var totalmin = (DateTime.Now - runingshift.StartAt).TotalMinutes;
+            if (wa.MaxWorkingHours != 0)
+            {
+                if (totalmin > wa.MaxWorkingHours * 60)
+                {
+                    runingshift.TotalMin = wa.MaxWorkingHours * 60;
+                    runingshift.TotalExtraMin = totalmin - runingshift.TotalMin;
+                    runingshift.Wage = Convert.ToDecimal(runingshift.TotalMin / 60) * wa.Wage;
+                    runingshift.ExtraTimeWage = Convert.ToDecimal(runingshift.TotalExtraMin / 60) * wa.WageafterMaxHours;
+                }
+            }
             runingshift.IsClosed = true;
+            runingshift.TotalMin = totalmin;
+            runingshift.Wage = Convert.ToDecimal(runingshift.TotalMin / 60) * wa.Wage;
             runingshift.EndAt = DateTime.Now;
             db.SaveChanges();
             return Json(new { id1 = runingshift.WaiterID }, JsonRequestBehavior.AllowGet);

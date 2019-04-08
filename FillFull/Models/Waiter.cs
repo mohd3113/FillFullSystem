@@ -11,9 +11,11 @@ namespace FillFull.Models
         public int WaiterID { get; set; }
 
         [Display(Name = "First Name")]
+        [Required]
         public string FirstName { get; set; }
 
         [Display(Name = "Last Name")]
+        [Required]
         public string LastName { get; set; }
 
         public string Email { get; set; }
@@ -24,6 +26,7 @@ namespace FillFull.Models
         public string Address { get; set; }
 
         [Display(Name = "Start Time")]
+        [Required]
         public string StartTime { get; set; }
 
         [Display(Name = "End Time")]
@@ -31,7 +34,12 @@ namespace FillFull.Models
 
         public string ImagePath { get; set; }
 
+        [Required]
         public decimal Wage { get; set; }
+
+        public double MaxWorkingHours { get; set; }
+
+        public decimal WageafterMaxHours { get; set; }
 
         public ICollection<WaiterWork> WaiterWorks { get; set; }
 

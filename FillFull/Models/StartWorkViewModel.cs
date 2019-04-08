@@ -19,6 +19,12 @@ namespace FillFull.Models
 
         public double TotalMin { get; set; }
 
+        public double TotalExtaMin { get; set; }
+
+        public decimal ExtraTimeWage { get; set; }
+
+
+
         public decimal Total_Wage { get; set; }
 
         public StartWorkViewModel()

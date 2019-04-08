@@ -56,13 +56,44 @@
                                                 <i class="fa fa-percent fa-2x"></i>
                                             </div>
                                             <div class="media-body">
-                                                <h3 class="mb-2">£ @Model.Total_Wage.ToString("0.00")</h3>
+                                                <h3 class="mb-2">€@Model.Total_Wage.ToString("0.00")</h3>
                                                 <div class="mb-0">Wage</div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
+                            <div class="col-12 col-sm-6 col-xl d-flex">
+                                <div class="card flex-fill">
+                                    <div class="card-body py-4">
+                                        <div class="media">
+                                            <div class="d-inline-block mt-2 mr-3">
+                                                <i class="fa fa-percent fa-2x"></i>
+                                            </div>
+                                            <div class="media-body">
+                                                <h3 class="mb-2">@TimeSpan.FromMinutes(Model.TotalExtaMin).ToString(@"hh\:mm")</h3>
+                                                <div class="mb-0">Extra Time</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-12 col-sm-6 col-xl d-flex">
+                                <div class="card flex-fill">
+                                    <div class="card-body py-4">
+                                        <div class="media">
+                                            <div class="d-inline-block mt-2 mr-3">
+                                                <i class="fa fa-percent fa-2x"></i>
+                                            </div>
+                                            <div class="media-body">
+                                                <h3 class="mb-2">€@Model.ExtraTimeWage.ToString("0.00")</h3>
+                                                <div class="mb-0">Extra Time Wage</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
                         </div>
                         <div class="row">
                             <div class="col-md-6 col-xs-12">
