@@ -14,7 +14,7 @@ using Microsoft.AspNet.Identity.Owin;
 
 namespace FillFull.Controllers
 {
-
+    [Authorize(Roles = "Manager")]
     public class WaitersController : Controller
     {
         private FillFullDataContext db = new FillFullDataContext();
@@ -76,7 +76,6 @@ namespace FillFull.Controllers
                 startmodel = new StartWorkViewModel
                 {
                     WaiterID = id.Value,
-
                 };
             }
             else
@@ -87,11 +86,23 @@ namespace FillFull.Controllers
                     WorkStartID = ifstillworking.WaiterWorkID,
                     Start = ifstillworking.StartAt
                 };
+                double totalbreakmin = 0;
                 if (ifstillworking.WaiterBreaks != null)
                 {
                     startmodel.waiterBreaks = ifstillworking.WaiterBreaks.ToList();
+                    foreach(var br in startmodel.waiterBreaks)
+                    {
+                        if(br.EndAt != null)
+                        {
+                            totalbreakmin += (br.EndAt.Value - br.StartAt).TotalMinutes;
+                        }
+                        else
+                        {
+                            totalbreakmin += (DateTime.Now - br.StartAt).TotalMinutes;
+                        }
+                    }
                 }
-
+           
                 var totalmin = (DateTime.Now - startmodel.Start.Value).TotalMinutes;
                 if (wa.MaxWorkingHours != 0)
                 {
@@ -105,8 +116,9 @@ namespace FillFull.Controllers
                     }
 
                 }
+                startmodel.WorkingBreakMin = totalbreakmin;
                 startmodel.TotalMin = totalmin;
-                startmodel.Total_Wage = Convert.ToDecimal(startmodel.TotalMin / 60) * wa.Wage;      
+                startmodel.Total_Wage = Convert.ToDecimal(startmodel.TotalMin / 60) * wa.Wage;
             }
             return View(startmodel);
         }
@@ -265,25 +277,50 @@ namespace FillFull.Controllers
 
             if (ModelState.IsValid)
             {
-                if (uploadFile != null && uploadFile.ContentLength > 0)
-                {
-                    if (!string.IsNullOrEmpty(waiter.ImagePath) && waiter.ImagePath != "PeopleImages/default.png")
-                    {
-                        if (System.IO.File.Exists(Server.MapPath(waiter.ImagePath)))
-                        {
-                            System.IO.File.Delete(Server.MapPath(waiter.ImagePath));
-                        }
-                    }
-                    var fileName = waiter.WaiterID.ToString() + "_Image" + Path.GetExtension(uploadFile.FileName);
-                    var path = Path.Combine(Server.MapPath("~/PeopleImages/"), fileName);
-                    uploadFile.SaveAs(path);
-                    waiter.ImagePath = "PeopleImages/" + fileName;
-                }
+
                 db.Entry(waiter).State = EntityState.Modified;
                 db.SaveChanges();
                 return RedirectToAction("Index");
             }
             return View(waiter);
+        }
+
+        public ActionResult BreakWork(int? shiftid)
+        {
+            if (shiftid == null)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+            }
+            var waiterwork = db.WaiterWorks.SingleOrDefault(p => p.WaiterWorkID == shiftid);
+            if (waiterwork == null)
+            {
+                return HttpNotFound();
+            }
+            WaiterBreak breake1 = new WaiterBreak
+            {
+                WaiterWorkID = waiterwork.WaiterWorkID,
+                StartAt = DateTime.Now,
+            };
+            db.WaiterBreaks.Add(breake1);
+            db.SaveChanges();
+            return Json(new { id1 = waiterwork.WaiterID }, JsonRequestBehavior.AllowGet);
+
+
+        }
+        public ActionResult Continue(int? shiftid)
+        {
+            if (shiftid == null)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+            }
+            var waiterwork = db.WaiterWorks.SingleOrDefault(p => p.WaiterWorkID == shiftid);
+            if (waiterwork == null)
+            {
+                return HttpNotFound();
+            }
+            waiterwork.EndAt = DateTime.Now;
+            db.SaveChanges();
+            return Json(new { id1 = waiterwork.WaiterID }, JsonRequestBehavior.AllowGet);
         }
 
         // GET: Waiters/Delete/5

@@ -23,7 +23,7 @@ namespace FillFull.Models
 
         public decimal ExtraTimeWage { get; set; }
 
-
+        public double WorkingBreakMin { get; set; }
 
         public decimal Total_Wage { get; set; }
 
