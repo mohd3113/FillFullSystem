@@ -132,6 +132,36 @@
                     }
                 });
             });
+              $('#Breakwork').click(function (e) {
+                e.preventDefault();
+                var id1 = @Model.WorkStartID;
+                $.ajax({
+                    url: "/Waiters/BreakWork",
+                    type: "Post",
+                    data: { shiftid: id1 },
+                    success: function (response) {
+                        window.location.href = '/Waiters/StartWork?id=' + response.id1 + '';
+                        },
+                    error: function () {
+                        alert("An error has occured!!!");
+                    }
+                });
+            });
+            $('#EndBreak').click(function (e) {
+                e.preventDefault();
+                var id1 = @Model.WorkStartID;
+                $.ajax({
+                    url: "/Waiters/Continue",
+                    type: "Post",
+                    data: { shiftid: id1 },
+                    success: function (response) {
+                        window.location.href = '/Waiters/StartWork?id=' + response.id1 + '';
+                        },
+                    error: function () {
+                        alert("An error has occured!!!");
+                    }
+                });
+            });
         });
     </script>
 }
