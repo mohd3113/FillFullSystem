@@ -23,7 +23,9 @@ namespace FillFull.Models
 
         public decimal ExtraTimeWage { get; set; }
 
+        public double TotalMinDaily { get; set; }
 
+        public bool IsExceeded { get; set; }
 
         public decimal Total_Wage { get; set; }
 

@@ -17,12 +17,6 @@ namespace FillFull.Models
 
         public double TotalMin { get; set; }
 
-        public double TotalExtraMin { get; set; }
-
-        public decimal Wage { get; set; }
-
-        public decimal ExtraTimeWage { get; set; } 
-
         public bool IsClosed { get; set; }
 
         public ICollection<WaiterBreak> WaiterBreaks { get; set; }

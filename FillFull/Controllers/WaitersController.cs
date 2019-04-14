@@ -93,20 +93,28 @@ namespace FillFull.Controllers
                 }
 
                 var totalmin = (DateTime.Now - startmodel.Start.Value).TotalMinutes;
+                var totalminmonthly = db.WaiterWorks.Where(p => p.WaiterID == wa.WaiterID && p.StartAt.Month == DateTime.Now.Month).Sum(p => p.TotalMin);
                 if (wa.MaxWorkingHours != 0)
                 {
-                    if (totalmin > wa.MaxWorkingHours * 60)
+                    if ((totalmin + totalminmonthly) > (wa.MaxWorkingHours * 60))
                     {
                         startmodel.TotalMin = wa.MaxWorkingHours * 60;
-                        startmodel.TotalExtaMin = totalmin - startmodel.TotalMin;
+                        startmodel.TotalExtaMin = totalminmonthly + totalmin - (wa.MaxWorkingHours * 60);
                         startmodel.Total_Wage = Convert.ToDecimal(startmodel.TotalMin / 60) * wa.Wage;
                         startmodel.ExtraTimeWage = Convert.ToDecimal(startmodel.TotalExtaMin / 60) * wa.WageafterMaxHours;
+                        startmodel.TotalMinDaily = totalmin;
+                        startmodel.IsExceeded = true;
                         return View(startmodel);
+                    }
+                    else
+                    {
+                        startmodel.TotalMin = totalminmonthly;
+                        startmodel.Total_Wage = Convert.ToDecimal(startmodel.TotalMin / 60) * wa.Wage;
+                        startmodel.TotalMinDaily = totalmin;
+                        startmodel.IsExceeded = false;
                     }
 
                 }
-                startmodel.TotalMin = totalmin;
-                startmodel.Total_Wage = Convert.ToDecimal(startmodel.TotalMin / 60) * wa.Wage;      
             }
             return View(startmodel);
         }
@@ -148,24 +156,19 @@ namespace FillFull.Controllers
             {
                 return HttpNotFound();
             }
-            var wa = db.Waiters.SingleOrDefault(p => p.WaiterID == runingshift.WaiterID);
             var totalmin = (DateTime.Now - runingshift.StartAt).TotalMinutes;
-            if (wa.MaxWorkingHours != 0)
-            {
-                if (totalmin > wa.MaxWorkingHours * 60)
-                {
-                    runingshift.TotalMin = wa.MaxWorkingHours * 60;
-                    runingshift.TotalExtraMin = totalmin - runingshift.TotalMin;
-                    runingshift.Wage = Convert.ToDecimal(runingshift.TotalMin / 60) * wa.Wage;
-                    runingshift.ExtraTimeWage = Convert.ToDecimal(runingshift.TotalExtraMin / 60) * wa.WageafterMaxHours;
-                }
-            }
             runingshift.IsClosed = true;
             runingshift.TotalMin = totalmin;
-            runingshift.Wage = Convert.ToDecimal(runingshift.TotalMin / 60) * wa.Wage;
             runingshift.EndAt = DateTime.Now;
             db.SaveChanges();
             return Json(new { id1 = runingshift.WaiterID }, JsonRequestBehavior.AllowGet);
+        }
+
+        [HttpPost]
+        public ActionResult StartBrak(int? shiftid)
+        {
+            
+            return Json(new { id1 = 0 }, JsonRequestBehavior.AllowGet);
         }
 
 
