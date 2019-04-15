@@ -17,6 +17,8 @@
                         <img src="~/Images/logo.jpeg" width="200" height="100" />
                     </a>
                 </div>
+                @if (User.IsInRole("Manager"))
+                {
                 <ul class="sidebar-nav">
                     <li class="sidebar-item active" style="padding-top:10px">
                         <a href="@Url.Action("Index", "Home")" class="sidebar-link">
@@ -34,11 +36,12 @@
                         </a>
                     </li>
                     <li class="sidebar-item">
-                        <a href="~/Reports/Index" class="sidebar-link">
+                        <a href="#" class="sidebar-link">
                             <i class="align-middle" data-feather="file-text"></i> <span class="align-middle">Reports</span>
                         </a>
                     </li>
                 </ul>
+                }
             </div>
         </nav>
         <div class="main">

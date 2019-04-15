@@ -1,4 +1,6 @@
-﻿@{
+﻿@model FillFull.Models.DashboardViewModel
+
+@{
     ViewBag.Title = "Home Page";
 }
 
@@ -13,8 +15,23 @@
                         <i class="feather-lg text-primary" data-feather="clock"></i>
                     </div>
                     <div class="media-body">
-                        <h3 class="mb-2">15:30</h3>
-                        <div class="mb-0">Working Hours Today</div>
+                        <h3 class="mb-2">@TimeSpan.FromMinutes(Model.TotalHoursMo).ToString(@"hh\:mm")</h3>
+                        <div class="mb-0">Working Hours</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-12 col-sm-6 col-xl d-flex">
+        <div class="card flex-fill">
+            <div class="card-body py-4">
+                <div class="media">
+                    <div class="d-inline-block mt-2 mr-3">
+                        <i class="feather-lg text-success" data-feather="watch"></i>
+                    </div>
+                    <div class="media-body">
+                        <h3 class="mb-2">@TimeSpan.FromMinutes(Model.TotalExtraHoursMo).ToString(@"hh\:mm")</h3>
+                        <div class="mb-0">Extra Hours</div>
                     </div>
                 </div>
             </div>
@@ -28,38 +45,8 @@
                         <i class="feather-lg text-warning" data-feather="percent"></i>
                     </div>
                     <div class="media-body">
-                        <h3 class="mb-2">€ 150.5</h3>
-                        <div class="mb-0">Staff Payments Today</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="col-12 col-sm-6 col-xl d-flex">
-        <div class="card flex-fill">
-            <div class="card-body py-4">
-                <div class="media">
-                    <div class="d-inline-block mt-2 mr-3">
-                        <i class="feather-lg text-success" data-feather="dollar-sign"></i>
-                    </div>
-                    <div class="media-body">
-                        <h3 class="mb-2">4:30 Hours</h3>
-                        <div class="mb-0">Working Breaks Today</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="col-12 col-sm-6 col-xl d-none d-xxl-flex">
-        <div class="card flex-fill">
-            <div class="card-body py-4">
-                <div class="media">
-                    <div class="d-inline-block mt-2 mr-3">
-                        <i class="feather-lg text-info" data-feather="dollar-sign"></i>
-                    </div>
-                    <div class="media-body">
-                        <h3 class="mb-2">$ 18.700</h3>
-                        <div class="mb-0">Total Revenue</div>
+                        <h3 class="mb-2">€@Model.TotalWageMo.ToString("0.00")</h3>
+                        <div class="mb-0">Staff Wages</div>
                     </div>
                 </div>
             </div>

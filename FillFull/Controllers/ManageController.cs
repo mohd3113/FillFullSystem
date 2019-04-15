@@ -64,7 +64,7 @@ namespace FillFull.Controllers
                 : "";
 
             var userId = User.Identity.GetUserId();
-            var model = new IndexViewModel
+            var model = new AdminIndexViewModel
             {
                 HasPassword = HasPassword(),
                 PhoneNumber = await UserManager.GetPhoneNumberAsync(userId),

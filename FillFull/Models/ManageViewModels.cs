@@ -5,7 +5,7 @@ using Microsoft.Owin.Security;
 
 namespace FillFull.Models
 {
-    public class IndexViewModel
+    public class AdminIndexViewModel
     {
         public bool HasPassword { get; set; }
         public IList<UserLoginInfo> Logins { get; set; }

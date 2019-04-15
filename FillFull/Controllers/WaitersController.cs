@@ -31,12 +31,14 @@ namespace FillFull.Controllers
             }
         }
         // GET: Waiters
+        [Authorize(Roles = "Manager")]
         public ActionResult Index()
         {
             return View(db.Waiters.ToList());
         }
 
         // GET: Waiters/Details/5
+        [Authorize(Roles = "Manager")]
         public ActionResult Details(int? id)
         {
             if (id == null)
@@ -52,12 +54,14 @@ namespace FillFull.Controllers
         }
 
         // GET: Waiters/Create
+        [Authorize(Roles = "Manager")]
         public ActionResult Create()
         {
             return View();
         }
 
 
+        [Authorize(Roles = "waiter")]
         public ActionResult StartWork(int? id)
         {
             if (id == null)
@@ -69,7 +73,7 @@ namespace FillFull.Controllers
             {
                 return HttpNotFound();
             }
-            var ifstillworking = db.WaiterWorks.FirstOrDefault(p => p.WaiterID == id && p.IsClosed == false);
+            var ifstillworking = db.WaiterWorks.Include(b => b.WaiterBreaks).SingleOrDefault(p => p.WaiterID == id && p.IsClosed == false);
             StartWorkViewModel startmodel;
             if (ifstillworking == null)
             {
@@ -78,6 +82,32 @@ namespace FillFull.Controllers
                     WaiterID = id.Value,
 
                 };
+                var waworkmonthly = db.WaiterWorks.Where(p => p.WaiterID == wa.WaiterID && p.StartAt.Year == DateTime.Now.Year && p.StartAt.Month == DateTime.Now.Month).ToList();
+                var totalminmonthly = waworkmonthly.Sum(p => p.TotalMin);
+                double totalbrake = 0;
+                foreach (var wawo in waworkmonthly)
+                {
+                    if (wawo.WaiterBreaks != null)
+                        totalbrake += wawo.WaiterBreaks.Where(c => c.EndAt != null && c.StartAt.Month != DateTime.Now.Month && c.StartAt.Year != DateTime.Now.Year).Sum(p => (p.EndAt.Value - p.StartAt).TotalMinutes);
+                }
+                if (wa.MaxWorkingHours != 0)
+                {
+                    if ((totalminmonthly - totalbrake) > (wa.MaxWorkingHours * 60))
+                    {
+                        startmodel.TotalMin = wa.MaxWorkingHours * 60;
+                        startmodel.TotalExtaMin = totalminmonthly  - totalbrake  - (wa.MaxWorkingHours * 60);
+                        startmodel.Total_Wage = Convert.ToDecimal(startmodel.TotalMin / 60) * wa.Wage;
+                        startmodel.ExtraTimeWage = Convert.ToDecimal(startmodel.TotalExtaMin / 60) * wa.WageafterMaxHours;
+                        startmodel.IsExceeded = true;
+                        return View(startmodel);
+                    }
+                    else
+                    {
+                        startmodel.TotalMin = totalminmonthly - totalbrake;
+                        startmodel.Total_Wage = Convert.ToDecimal(startmodel.TotalMin / 60) * wa.Wage;
+                        startmodel.IsExceeded = false;
+                    }
+                }
             }
             else
             {
@@ -103,7 +133,7 @@ namespace FillFull.Controllers
                 }
 
                 var totalmin = (DateTime.Now - startmodel.Start.Value).TotalMinutes;
-                var waworkmonthly = db.WaiterWorks.Where(p => p.WaiterID == wa.WaiterID && p.StartAt.Year == DateTime.Now.Year && p.StartAt.Month == DateTime.Now.Month);
+                var waworkmonthly = db.WaiterWorks.Where(p => p.WaiterID == wa.WaiterID && p.StartAt.Year == DateTime.Now.Year && p.StartAt.Month == DateTime.Now.Month).ToList();
                 var totalminmonthly = waworkmonthly.Sum(p => p.TotalMin);
                 double totalbrake = 0;
                 foreach (var wawo in waworkmonthly)
@@ -138,6 +168,7 @@ namespace FillFull.Controllers
             return View(startmodel);
         }
 
+        [Authorize(Roles = "waiter")]
         [HttpPost]
         public ActionResult StartWork(StartWorkViewModel startWorkViewModel)
         {
@@ -152,17 +183,13 @@ namespace FillFull.Controllers
                 };
                 db.WaiterWorks.Add(waiterWork);
                 db.SaveChanges();
-                startWorkViewModel.Start = waiterWork.StartAt;
-                //startWorkViewModel.waiterBreaks = waiterWork.WaiterBreaks.ToList();
-                startWorkViewModel.WorkStartID = waiterWork.WaiterWorkID;
-                var employeeentrytime = startWorkViewModel.Start.Value;
-                startWorkViewModel.Total_Hour = 0;
-                startWorkViewModel.Total_Wage = 0;
-                return View(startWorkViewModel);
+
+                return RedirectToAction("StartWork", new { id = waiterWork.WaiterID });
             }
             return View(startWorkViewModel);
         }
 
+        [Authorize(Roles = "waiter")]
         [HttpPost]
         public ActionResult EndShift(int? shiftid)
         {
@@ -183,6 +210,7 @@ namespace FillFull.Controllers
             return Json(new { id1 = runingshift.WaiterID }, JsonRequestBehavior.AllowGet);
         }
 
+        [Authorize(Roles = "waiter")]
         [HttpPost]
         public ActionResult BreakWork(int? shiftid)
         {
@@ -203,23 +231,24 @@ namespace FillFull.Controllers
             db.WaiterBreaks.Add(breake1);
             db.SaveChanges();
             return Json(new { id1 = waiterwork.WaiterID }, JsonRequestBehavior.AllowGet);
-
-
         }
+
+        [Authorize(Roles = "waiter")]
+        [HttpPost]
         public ActionResult Continue(int? shiftid)
         {
             if (shiftid == null)
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            var waiterwork = db.WaiterWorks.SingleOrDefault(p => p.WaiterWorkID == shiftid);
+            var waiterwork = db.WaiterBreaks.SingleOrDefault(p => p.WaiterWorkID == shiftid && p.EndAt == null);
             if (waiterwork == null)
             {
                 return HttpNotFound();
             }
             waiterwork.EndAt = DateTime.Now;
             db.SaveChanges();
-            return Json(new { id1 = waiterwork.WaiterID }, JsonRequestBehavior.AllowGet);
+            return Json(new { id1 = waiterwork.WaiterWork.WaiterID }, JsonRequestBehavior.AllowGet);
         }
 
         // POST: Waiters/Create
@@ -227,7 +256,8 @@ namespace FillFull.Controllers
         // more details see https://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create([Bind(Include = "WaiterID,FirstName,LastName,Email,PhoneNumber,Address,StartTime,EndTime,Wage")] Waiter waiter, HttpPostedFileBase uploadFile)
+        [Authorize(Roles = "Manager")]
+        public ActionResult Create(Waiter waiter, HttpPostedFileBase uploadFile)
         {
             if (ModelState.IsValid)
             {
@@ -271,6 +301,7 @@ namespace FillFull.Controllers
             return View(waiter);
         }
 
+        [Authorize(Roles = "Manager")]
         private IdentityResult CreateRolesandUsers(string Role, ApplicationUser user)
         {
             ApplicationDbContext context = new ApplicationDbContext();
@@ -294,6 +325,7 @@ namespace FillFull.Controllers
             }
         }
         // GET: Waiters/Edit/5
+        [Authorize(Roles = "Manager")]
         public ActionResult Edit(int? id)
         {
             if (id == null)
@@ -313,7 +345,8 @@ namespace FillFull.Controllers
         // more details see https://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit([Bind(Include = "WaiterID,FirstName,LastName,Email,PhoneNumber,Address,StartTime,EndTime,Wage")] Waiter waiter, HttpPostedFileBase uploadFile)
+        [Authorize(Roles = "Manager")]
+        public ActionResult Edit(Waiter waiter, HttpPostedFileBase uploadFile)
         {
 
             if (ModelState.IsValid)
@@ -340,6 +373,7 @@ namespace FillFull.Controllers
         }
 
         // GET: Waiters/Delete/5
+        [Authorize(Roles = "Manager")]
         public ActionResult Delete(int? id)
         {
             if (id == null)
@@ -357,6 +391,7 @@ namespace FillFull.Controllers
         // POST: Waiters/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Manager")]
         public ActionResult DeleteConfirmed(int id)
         {
             Waiter waiter = db.Waiters.Find(id);

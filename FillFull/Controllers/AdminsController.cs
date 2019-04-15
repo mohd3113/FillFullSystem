@@ -13,6 +13,8 @@ using Microsoft.AspNet.Identity.Owin;
 
 namespace FillFull.Controllers
 {
+
+    [Authorize(Roles = "Manager")]
     public class AdminsController : Controller
     {
         private FillFullDataContext db = new FillFullDataContext();
@@ -29,6 +31,7 @@ namespace FillFull.Controllers
             }
         }
         // GET: Admins
+
         public ActionResult Index()
         {
             return View(db.Admins.ToList());
@@ -71,7 +74,7 @@ namespace FillFull.Controllers
                     var result = UserManager.Create(user, password);
                     if (result.Succeeded)
                     {
-                        var result1 = CreateRolesandUsers("admin", user);
+                        var result1 = CreateRolesandUsers("Manager", user);
                         if (result1.Succeeded)
                         {
                             db.Admins.Add(admin);

@@ -13,7 +13,7 @@ namespace FillFull.Migrations
         
         string IMigrationMetadata.Id
         {
-            get { return "201904140749192_migration1"; }
+            get { return "201904151221272_migration1"; }
         }
         
         string IMigrationMetadata.Source
