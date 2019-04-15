@@ -87,30 +87,49 @@ namespace FillFull.Controllers
                     WorkStartID = ifstillworking.WaiterWorkID,
                     Start = ifstillworking.StartAt
                 };
+                double totalbreakda = 0;
                 if (ifstillworking.WaiterBreaks != null)
                 {
                     startmodel.waiterBreaks = ifstillworking.WaiterBreaks.ToList();
+                    foreach (var waw in startmodel.waiterBreaks)
+                    {
+                        if (waw.EndAt != null)
+                            totalbreakda += (waw.EndAt.Value - waw.StartAt).TotalMinutes;
+                        else
+                        {
+                            totalbreakda += (DateTime.Now - waw.StartAt).TotalMinutes;
+                        }
+                    }
                 }
 
                 var totalmin = (DateTime.Now - startmodel.Start.Value).TotalMinutes;
-                var totalminmonthly = db.WaiterWorks.Where(p => p.WaiterID == wa.WaiterID && p.StartAt.Month == DateTime.Now.Month).Sum(p => p.TotalMin);
+                var waworkmonthly = db.WaiterWorks.Where(p => p.WaiterID == wa.WaiterID && p.StartAt.Year == DateTime.Now.Year && p.StartAt.Month == DateTime.Now.Month);
+                var totalminmonthly = waworkmonthly.Sum(p => p.TotalMin);
+                double totalbrake = 0;
+                foreach (var wawo in waworkmonthly)
+                {
+                    if (wawo.WaiterBreaks != null)
+                        totalbrake += wawo.WaiterBreaks.Where(c => c.EndAt != null && c.StartAt.Month != DateTime.Now.Month && c.StartAt.Year != DateTime.Now.Year).Sum(p => (p.EndAt.Value - p.StartAt).TotalMinutes);
+                }
                 if (wa.MaxWorkingHours != 0)
                 {
-                    if ((totalmin + totalminmonthly) > (wa.MaxWorkingHours * 60))
+                    if ((totalmin + totalminmonthly - totalbrake - totalbreakda) > (wa.MaxWorkingHours * 60))
                     {
                         startmodel.TotalMin = wa.MaxWorkingHours * 60;
-                        startmodel.TotalExtaMin = totalminmonthly + totalmin - (wa.MaxWorkingHours * 60);
+                        startmodel.TotalExtaMin = totalminmonthly + totalmin - totalbrake - totalbreakda - (wa.MaxWorkingHours * 60);
                         startmodel.Total_Wage = Convert.ToDecimal(startmodel.TotalMin / 60) * wa.Wage;
                         startmodel.ExtraTimeWage = Convert.ToDecimal(startmodel.TotalExtaMin / 60) * wa.WageafterMaxHours;
-                        startmodel.TotalMinDaily = totalmin;
+                        startmodel.TotalMinDaily = totalmin - totalbreakda;
+                        startmodel.TotalBreakDaily = totalbreakda;
                         startmodel.IsExceeded = true;
                         return View(startmodel);
                     }
                     else
                     {
-                        startmodel.TotalMin = totalminmonthly;
+                        startmodel.TotalMin = totalminmonthly - totalbrake;
                         startmodel.Total_Wage = Convert.ToDecimal(startmodel.TotalMin / 60) * wa.Wage;
                         startmodel.TotalMinDaily = totalmin;
+                        startmodel.TotalBreakDaily = totalbreakda;
                         startmodel.IsExceeded = false;
                     }
 
@@ -165,12 +184,43 @@ namespace FillFull.Controllers
         }
 
         [HttpPost]
-        public ActionResult StartBrak(int? shiftid)
+        public ActionResult BreakWork(int? shiftid)
         {
-            
-            return Json(new { id1 = 0 }, JsonRequestBehavior.AllowGet);
-        }
+            if (shiftid == null)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+            }
+            var waiterwork = db.WaiterWorks.SingleOrDefault(p => p.WaiterWorkID == shiftid);
+            if (waiterwork == null)
+            {
+                return HttpNotFound();
+            }
+            WaiterBreak breake1 = new WaiterBreak
+            {
+                WaiterWorkID = waiterwork.WaiterWorkID,
+                StartAt = DateTime.Now,
+            };
+            db.WaiterBreaks.Add(breake1);
+            db.SaveChanges();
+            return Json(new { id1 = waiterwork.WaiterID }, JsonRequestBehavior.AllowGet);
 
+
+        }
+        public ActionResult Continue(int? shiftid)
+        {
+            if (shiftid == null)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+            }
+            var waiterwork = db.WaiterWorks.SingleOrDefault(p => p.WaiterWorkID == shiftid);
+            if (waiterwork == null)
+            {
+                return HttpNotFound();
+            }
+            waiterwork.EndAt = DateTime.Now;
+            db.SaveChanges();
+            return Json(new { id1 = waiterwork.WaiterID }, JsonRequestBehavior.AllowGet);
+        }
 
         // POST: Waiters/Create
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 

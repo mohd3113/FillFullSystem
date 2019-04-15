@@ -17,6 +17,8 @@ namespace FillFull.Models
 
         public double Total_Hour { get; set; }
 
+        public double TotalBreakDaily { get; set; }
+
         public double TotalMin { get; set; }
 
         public double TotalExtaMin { get; set; }
