@@ -10,9 +10,9 @@ namespace FillFull
         public void Configuration(IAppBuilder app)
         {
             ConfigureAuth(app);
-            var configuration = new Migrations.Configuration();
-            var migrator = new DbMigrator(configuration);
-            migrator.Update();
+            //var configuration = new Migrations.Configuration();
+            //var migrator = new DbMigrator(configuration);
+            //migrator.Update();
         }
     }
 }

@@ -158,7 +158,7 @@ namespace FillFull.Controllers
                     {
                         startmodel.TotalMin = totalminmonthly - totalbrake;
                         startmodel.Total_Wage = Convert.ToDecimal(startmodel.TotalMin / 60) * wa.Wage;
-                        startmodel.TotalMinDaily = totalmin;
+                        startmodel.TotalMinDaily = totalmin - totalbreakda;
                         startmodel.TotalBreakDaily = totalbreakda;
                         startmodel.IsExceeded = false;
                     }
@@ -197,14 +197,28 @@ namespace FillFull.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            var runingshift = db.WaiterWorks.SingleOrDefault(p => p.WaiterWorkID == shiftid);
+            var runingshift = db.WaiterWorks.Include(c=>c.WaiterBreaks).SingleOrDefault(p => p.WaiterWorkID == shiftid);
             if (runingshift == null)
             {
                 return HttpNotFound();
             }
+            double totalbreakda = 0;
+            if (runingshift.WaiterBreaks != null)
+            {
+                var waiterBreaks = runingshift.WaiterBreaks.ToList();
+                foreach (var waw in waiterBreaks)
+                {
+                    if (waw.EndAt != null)
+                        totalbreakda += (waw.EndAt.Value - waw.StartAt).TotalMinutes;
+                    else
+                    {
+                        totalbreakda += (DateTime.Now - waw.StartAt).TotalMinutes;
+                    }
+                }
+            }
             var totalmin = (DateTime.Now - runingshift.StartAt).TotalMinutes;
             runingshift.IsClosed = true;
-            runingshift.TotalMin = totalmin;
+            runingshift.TotalMin = totalmin - totalbreakda;
             runingshift.EndAt = DateTime.Now;
             db.SaveChanges();
             return Json(new { id1 = runingshift.WaiterID }, JsonRequestBehavior.AllowGet);
