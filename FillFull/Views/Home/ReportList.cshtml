@@ -1,0 +1,75 @@
+﻿@model  List<FillFull.Models.IndivisualList>
+<div class="card">
+    <div class="card-header">
+        <h5 class="card-title">Search Results</h5>
+    </div>
+    <div class="card-body">
+        <table id="datatables-buttons" class="table table-striped" style="width:100%">
+            <thead>
+                <tr>
+                    <th>
+                        Waiter ID
+                    </th>
+                    <th>
+                        Waiter Name
+                    </th>
+                    <th>
+                        Total Hours
+                    </th>
+                    <th>
+                        Total Wage
+                    </th>
+                    <th>
+                        Total Extra Time Hours
+                    </th>
+                    <th>
+                        Total Extra Time Wage
+                    </th>
+                    <th>
+                        Total
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>
+                            @item.ID
+                        </td>
+                        <td>
+                            @item.Name
+                        </td>
+                        <td>
+                            @TimeSpan.FromMinutes(item.TotalHours).ToString(@"hh\:mm")
+                  
+                        </td>
+                        <td>
+                            €@item.TotalWage.ToString("0.00")
+                        </td>
+                        <td>
+                            @TimeSpan.FromMinutes(item.TotalExtra).ToString(@"hh\:mm")
+                        </td>
+                        <td>
+                            €@item.TotalExtraWage.ToString("0.00")
+                        </td>
+                        <td>
+                            €@((item.TotalWage + item.TotalExtraWage).ToString("0.00"))
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+<script>
+    document.addEventListener("DOMContentLoaded", function (event) {
+        // Datatables with Buttons
+        var datatablesButtons = $('#datatables-buttons').DataTable({
+            lengthChange: !1,
+            buttons: ["copy", "print"],
+            responsive: true
+        });
+        datatablesButtons.buttons().container().appendTo("#datatables-buttons_wrapper .col-md-6:eq(0)")
+    });
+</script>

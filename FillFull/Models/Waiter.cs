@@ -43,5 +43,7 @@ namespace FillFull.Models
 
         public ICollection<WaiterWork> WaiterWorks { get; set; }
 
+        public ICollection<Activities> Activities { get; set; }
+
     }
 }

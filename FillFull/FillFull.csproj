@@ -202,17 +202,19 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\201904151221272_migration1.cs" />
-    <Compile Include="Migrations\201904151221272_migration1.Designer.cs">
-      <DependentUpon>201904151221272_migration1.cs</DependentUpon>
+    <Compile Include="Migrations\201904220757310_migration1.cs" />
+    <Compile Include="Migrations\201904220757310_migration1.Designer.cs">
+      <DependentUpon>201904220757310_migration1.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
+    <Compile Include="Models\Activities.cs" />
     <Compile Include="Models\Admin.cs" />
     <Compile Include="Models\DashboardViewModel.cs" />
     <Compile Include="Models\FillFullDataContext.cs" />
     <Compile Include="Models\IdentityModels.cs" />
     <Compile Include="Models\ManageViewModels.cs" />
+    <Compile Include="Models\ReportsViewmodel.cs" />
     <Compile Include="Models\StartWorkViewModel.cs" />
     <Compile Include="Models\Waiter.cs" />
     <Compile Include="Models\WaiterBreak.cs" />
@@ -294,6 +296,9 @@
     <Content Include="Views\Admins\Index.cshtml" />
     <Content Include="Views\Waiters\StartWork.cshtml" />
     <Content Include="Views\Waiters\WordPaView.cshtml" />
+    <Content Include="Views\Home\Reports.cshtml" />
+    <Content Include="Views\Home\ReportList.cshtml" />
+    <Content Include="Views\Home\IndivisualReportList.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -313,8 +318,8 @@
     <Content Include="Scripts\jquery-3.3.1.min.map" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Migrations\201904151221272_migration1.resx">
-      <DependentUpon>201904151221272_migration1.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\201904220757310_migration1.resx">
+      <DependentUpon>201904220757310_migration1.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

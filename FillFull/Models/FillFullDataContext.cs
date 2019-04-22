@@ -19,5 +19,7 @@ namespace FillFull.Models
         public DbSet<WaiterWork> WaiterWorks { get; set; }
 
         public DbSet<WaiterBreak> WaiterBreaks { get; set; }
+
+        public DbSet<Activities> Activities { get; set; }
     }
 }

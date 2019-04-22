@@ -1,0 +1,206 @@
+﻿@model FillFull.Models.ReportsViewmodel
+@{
+    ViewBag.Title = "Reports";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Reports</h2>
+<div class="row">
+    <div class="col-md-6">
+        <div id="myModal" style="float:right;display:none">
+            <div class="spinner-border text-primary mr-2" role="status">
+                <span class="sr-only">Loading...</span>
+            </div>
+        </div>
+    </div>
+</div>
+<hr />
+<div class="row">
+    <div class="col-lg-12">
+        <div class="card">
+            <div class="card-header">
+                <ul class="nav nav-pills card-header-pills pull-right" role="tablist">
+                    <li class="nav-item">
+                        <a class="nav-link active" id="statistictab" data-toggle="tab" href="#tab-1">Indivisual Reports</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" id="statistictab" data-toggle="tab" href="#tab-2">All Waiters Reports</a>
+                    </li>
+                </ul>
+            </div>
+            <div class="card-body">
+                <div class="tab-content">
+                    <div class="tab-pane fade show active" id="tab-1" role="tabpanel">
+
+                        <div class="row">
+                            <div class="col-md-3">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5 class="card-title">Waiters Reports</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <form id="addviewform">
+                                            @Html.AntiForgeryToken()
+                                            <div class="form-group">
+                                                <label class="form-label">Waiter</label>
+                                                @Html.DropDownList("WaiterID", new SelectList(ViewBag.Waiters, "id", "Name"), "---Please Select---", new { @class = "form-control required selectre" })
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="form-label">Date (Start - End)</label>
+                                                <input type="text" id="DateRange2" name="DateRange2" class="form-control DateTimeSe required">
+                                            </div>
+                                            <button class="btn btn-primary" id="submitindivisual">Submit</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                            <div id="Results" class="col-md-9">
+                                @{
+                                    Html.RenderPartial("IndivisualReportList", new List<FillFull.Models.IndivisualList>());
+                                }
+                            </div>
+                        </div>
+                    </div>
+                    <div class="tab-pane fade show" id="tab-2" role="tabpanel">
+                        <div class="row">
+                            <div class="col-md-3">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5 class="card-title">All Waiters</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <form id="allreportdiv">
+                                            @Html.AntiForgeryToken()
+                                            <div class="form-group">
+                                                <label class="form-label">Date (Start - End)</label>
+                                                <input type="text" id="DateRange" name="DateRange" class="form-control DateTimeSe required">
+                                            </div>
+                                            <button class="btn btn-primary" id="submitAll">Submit</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-9">
+                                <div id="Results2">
+                                    @{
+                                        Html.RenderPartial("ReportList", new List<FillFull.Models.IndivisualList>());
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@section scripts {
+    <script>
+
+        $(document).ready(function () {
+            $(document).ajaxStart(function () {
+                $("#myModal").show();
+            }).ajaxStop(function () {
+                $("#myModal").hide();
+            });
+        });
+        document.addEventListener("DOMContentLoaded", function (event) {
+            var $validationForm1 = $('#addviewform');
+            var $validationForm2 = $('#allreportdiv');
+            $('.DateTimeSe').daterangepicker({
+                showDropdowns: true,
+                startDate: moment().startOf('hour'),
+                endDate: moment().startOf('hour').add(32, 'hour'),
+                locale: {
+                    format: 'DD/MM/YYYY'
+                }
+
+            });
+
+            $('.selectre').select2({
+                allowClear: true,
+                placeholder: '---Please Select---',
+            });
+
+            $validationForm1.validate({
+                errorPlacement: function errorPlacement(error, element) {
+                    $(element).parents('.form-group').append(
+                        error.addClass('invalid-feedback small d-block')
+                    )
+                },
+                highlight: function (element) {
+                    $(element).addClass('is-invalid');
+                },
+                unhighlight: function (element) {
+                    $(element).removeClass('is-invalid');
+                }
+            });
+
+            $validationForm2.validate({
+                errorPlacement: function errorPlacement(error, element) {
+                    $(element).parents('.form-group').append(
+                        error.addClass('invalid-feedback small d-block')
+                    )
+                },
+                highlight: function (element) {
+                    $(element).addClass('is-invalid');
+                },
+                unhighlight: function (element) {
+                    $(element).removeClass('is-invalid');
+                }
+            });
+            $('#submitformview').click(function (e) {
+                e.preventDefault(); // <------------------ stop default behaviour of button
+                if (!$validationForm1.valid()) {
+                    return;
+                }
+                var $this = $validationForm1;
+                var frmValues = $this.serialize();
+                $.ajax({
+                    url: '/Home/IndivisualReport',
+                    type: "POST",
+                    data: frmValues,
+                    success: function (response) {
+                        $('#Results').html(response);
+                        // Datatables with Buttons
+                        var datatablesButtons = $('#datatables-buttons2').DataTable({
+                            lengthChange: !1,
+                            buttons: ["copy", "print"],
+                            responsive: true
+                        });
+                        datatablesButtons.buttons().container().appendTo("#datatables-buttons2_wrapper .col-md-6:eq(0)");
+                    },
+                    error: function () {
+                        alert("An error has occured!!!");
+                    }
+                });
+            });
+            $('#submitAll').click(function (e) {
+                e.preventDefault(); // <------------------ stop default behaviour of button
+                if (!$validationForm2.valid()) {
+                    return;
+                }
+                var $this = $validationForm2;
+                var frmValues = $this.serialize();
+                $.ajax({
+                    url: '/Home/AllReport',
+                    type: "POST",
+                    data: frmValues,
+                    success: function (response) {
+                        $('#Results2').html(response);
+                        // Datatables with Buttons
+                        var datatablesButtons2 = $('#datatables-buttons').DataTable({
+                            lengthChange: !1,
+                            buttons: ["copy", "print"],
+                            responsive: true
+                        });
+                        datatablesButtons2.buttons().container().appendTo("#datatables-buttons_wrapper .col-md-6:eq(0)");
+                    },
+                    error: function () {
+                        alert("An error has occured!!!");
+                    }
+                });
+            });
+        });
+    </script>
+}

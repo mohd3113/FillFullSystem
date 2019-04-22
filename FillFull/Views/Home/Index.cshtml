@@ -134,37 +134,19 @@
         <div class="card flex-fill w-100">
             <div class="card-header">
                 <span class="badge badge-info float-right">Today</span>
-                <h5 class="card-title mb-0">Recent Staff Activity</h5>
+                <h5 class="card-title mb-0">Daily feed</h5>
             </div>
             <div class="card-body">
-                <div class="media">
-                    <img src="~/Images/download.png" width="36" height="36" class="rounded-circle mr-2">
-                    <div class="media-body">
-                        <small class="float-right text-navy">7:51 pm</small>
-                        <strong>Ashley Briggs</strong> started new shift <strong>At</strong><br />
-                        <small class="text-muted">Total Hours 5:30 Hours</small><br />
+                @foreach (var item in Model.Activities)
+                {
+                    <div class="media">
+                        <div class="media-body">
+                            <strong>@item.ActivityText on</strong><br />
+                            <small class="text-muted">Today @item.ActivityDate.ToShortTimeString()</small><br />
+                        </div>
                     </div>
-                </div>
-                <hr />
-                <div class="media">
-                    <img src="~/Images/download.png" width="36" height="36" class="rounded-circle mr-2">
-                    <div class="media-body">
-                        <small class="float-right text-navy">7:51 pm</small>
-                        <strong>Ashley Briggs</strong> started a break <strong>At</strong><br />
-                        <small class="text-muted">Total Hours 2:30 Hours</small><br />
-                    </div>
-                </div>
-                <hr />
-                <div class="media">
-                    <img src="~/Images/download.png" width="36" height="36" class="rounded-circle mr-2">
-                    <div class="media-body">
-                        <small class="float-right text-navy">7:51 pm</small>
-                        <strong>Ashley Briggs</strong>ended his shift <strong>At</strong><br />
-                        <small class="text-muted">Total shift Hours 5:30 Hours, Total Payment: €15.00</small><br />
-                    </div>
-                </div>
-                <hr />
-                <a href="#" class="btn btn-primary btn-block">Load more</a>
+                    <hr />
+                }
             </div>
         </div>
     </div>
@@ -173,39 +155,51 @@
 <div class="row">
     <div class="col-12 col-lg-6 col-xl-6 d-flex">
         <div class="card flex-fill w-100">
-            <div class="card-header">          
-                <h5 class="card-title mb-0">Waiters</h5>
+            <div class="card-header">
+                <h5 class="card-title mb-0">Currently Waiters status</h5>
             </div>
             <div class="card-body d-flex w-100">
                 <div class="align-self-center chart chart-lg">
                     <table id="datatables-dashboard" class="table table-striped my-0">
                         <thead>
                             <tr>
-                                <th>ID</th>
-                                <th class="d-none d-xl-table-cell">Name</th>
+                                <th>Name</th>
                                 <th>Status</th>
+                                <th>Start at</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <tr>
-                                <td>Project Apollo</td>
-                                <td class="d-none d-xl-table-cell">01/01/2018</td>
-                                <td class="d-none d-xl-table-cell">31/06/2018</td>
-                                <td><span class="badge badge-success">Done</span></td>
-                                <td class="d-none d-md-table-cell">Carl Jenkins</td>
-                            </tr>
+                            @foreach (var item in Model.CorrentlyWaiters)
+                            {
+                                <tr>
+                                    <td>@item.Name</td>
+                                    @if (item.status == "Offline")
+                                    {
+                                        <td><span class="badge badge-danger">Offline</span></td>
+                                    }
+                                    else if (item.status == "Working")
+                                    {
+                                        <td><span class="badge badge-success">In work</span></td>
+                                    }
+                                    else
+                                    {
+                                        <td><span class="badge badge-warning">In break</span></td>
+                                    }
+                                    <td>@item.StartAt</td>
+                                </tr>
+                            }
                         </tbody>
                     </table>
                 </div>
             </div>
         </div>
 
-        
+
     </div>
     <div class="col-12 col-xl-6 d-none d-xl-flex">
         <div class="card flex-fill w-100">
-            <div class="card-header">   
-                <h5 class="card-title mb-0">Weekly top 5 worker productivity</h5>
+            <div class="card-header">
+                <h5 class="card-title mb-0">Weekly top 5 Weatires</h5>
             </div>
             <div class="card-body d-flex">
                 <div class="align-self-center w-100">
@@ -218,38 +212,32 @@
                     <table class="table mb-0">
                         <thead>
                             <tr>
-                                <th>Worker</th>
+                                <th>Weatire</th>
                                 <th class="text-right">Hours</th>
-                                <th class="text-right">Value</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr>
                                 <td><i class="fas fa-square-full text-primary"></i> Mohammad</td>
                                 <td class="text-right">70</td>
-                                <td class="text-right text-success">+43%</td>
                             </tr>
                             <tr>
                                 <td><i class="fas fa-square-full text-warning"></i> Ahmad</td>
                                 <td class="text-right">65</td>
-                                <td class="text-right text-success">+13%</td>
                             </tr>
                             <tr>
                                 <td><i class="fas fa-square-full text-danger"></i> Mahmoud</td>
                                 <td class="text-right">60</td>
-                                <td class="text-right text-success">+24%</td>
                             </tr>
                             <tr>
                                 <td><i class="fas fa-square-full text-dark"></i> Shadi</td>
                                 <td class="text-right">50</td>
-                                <td class="text-right text-success">+11%</td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
             </div>
         </div>
-
         <script>
             document.addEventListener("DOMContentLoaded", function (event) {
                 // Pie chart

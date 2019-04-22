@@ -17,20 +17,20 @@ namespace FillFull.Migrations
 
         protected override void Seed(FillFull.Models.FillFullDataContext context)
         {
-            using (var db = new FillFullDataContext())
-            {
-                Admin newadmin = new Admin
-                {
-                    FirstName = "Manager",
-                    LastName = "Manager",
-                    Email = "Manager@gmail.com",
-                    PhoneNumber = "0097143432434",
-                    Address = "Girna",
-                };
-                db.Admins.Add(newadmin);
-                db.SaveChanges();
-            }
-            CreateUser();
+            //using (var db = new FillFullDataContext())
+            //{
+            //    Admin newadmin = new Admin
+            //    {
+            //        FirstName = "Manager",
+            //        LastName = "Manager",
+            //        Email = "Manager@gmail.com",
+            //        PhoneNumber = "0097143432434",
+            //        Address = "Girna",
+            //    };
+            //    db.Admins.Add(newadmin);
+            //    db.SaveChanges();
+            //}
+            //CreateUser();
         }
         private IdentityResult CreateUser()
         {

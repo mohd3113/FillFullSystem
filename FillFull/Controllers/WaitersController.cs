@@ -95,7 +95,7 @@ namespace FillFull.Controllers
                     if ((totalminmonthly - totalbrake) > (wa.MaxWorkingHours * 60))
                     {
                         startmodel.TotalMin = wa.MaxWorkingHours * 60;
-                        startmodel.TotalExtaMin = totalminmonthly  - totalbrake  - (wa.MaxWorkingHours * 60);
+                        startmodel.TotalExtaMin = totalminmonthly - totalbrake - (wa.MaxWorkingHours * 60);
                         startmodel.Total_Wage = Convert.ToDecimal(startmodel.TotalMin / 60) * wa.Wage;
                         startmodel.ExtraTimeWage = Convert.ToDecimal(startmodel.TotalExtaMin / 60) * wa.WageafterMaxHours;
                         startmodel.IsExceeded = true;
@@ -182,8 +182,15 @@ namespace FillFull.Controllers
 
                 };
                 db.WaiterWorks.Add(waiterWork);
+                var waiter = db.Waiters.SingleOrDefault(p => p.WaiterID == startWorkViewModel.WaiterID);
+                Activities activities = new Activities
+                {
+                    ActivityText = waiter.FirstName + " " + waiter.LastName + " has started new shift",
+                    ActivityDate = DateTime.Now,
+                    WaiterID = waiter.WaiterID
+                };
+                db.Activities.Add(activities);
                 db.SaveChanges();
-
                 return RedirectToAction("StartWork", new { id = waiterWork.WaiterID });
             }
             return View(startWorkViewModel);
@@ -197,7 +204,7 @@ namespace FillFull.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            var runingshift = db.WaiterWorks.Include(c=>c.WaiterBreaks).SingleOrDefault(p => p.WaiterWorkID == shiftid);
+            var runingshift = db.WaiterWorks.Include(c => c.WaiterBreaks).SingleOrDefault(p => p.WaiterWorkID == shiftid);
             if (runingshift == null)
             {
                 return HttpNotFound();
@@ -220,6 +227,14 @@ namespace FillFull.Controllers
             runingshift.IsClosed = true;
             runingshift.TotalMin = totalmin - totalbreakda;
             runingshift.EndAt = DateTime.Now;
+            var waiter = db.Waiters.SingleOrDefault(p => p.WaiterID == runingshift.WaiterID);
+            Activities activities = new Activities
+            {
+                ActivityText = waiter.FirstName + " " + waiter.LastName + " has ended his shift",
+                ActivityDate = DateTime.Now,
+                WaiterID = waiter.WaiterID
+            };
+            db.Activities.Add(activities);
             db.SaveChanges();
             return Json(new { id1 = runingshift.WaiterID }, JsonRequestBehavior.AllowGet);
         }
@@ -243,6 +258,14 @@ namespace FillFull.Controllers
                 StartAt = DateTime.Now,
             };
             db.WaiterBreaks.Add(breake1);
+            var waiter = db.Waiters.SingleOrDefault(p => p.WaiterID == waiterwork.WaiterID);
+            Activities activities = new Activities
+            {
+                ActivityText = waiter.FirstName + " " + waiter.LastName + " has started a break",
+                ActivityDate = DateTime.Now,
+                WaiterID = waiter.WaiterID
+            };
+            db.Activities.Add(activities);
             db.SaveChanges();
             return Json(new { id1 = waiterwork.WaiterID }, JsonRequestBehavior.AllowGet);
         }
@@ -261,6 +284,14 @@ namespace FillFull.Controllers
                 return HttpNotFound();
             }
             waiterwork.EndAt = DateTime.Now;
+            var waiter = db.Waiters.SingleOrDefault(p => p.WaiterID == waiterwork.WaiterWork.WaiterID);
+            Activities activities = new Activities
+            {
+                ActivityText = waiter.FirstName + " " + waiter.LastName + " has ended his break",
+                ActivityDate = DateTime.Now,
+                WaiterID = waiter.WaiterID
+            };
+            db.Activities.Add(activities);
             db.SaveChanges();
             return Json(new { id1 = waiterwork.WaiterWork.WaiterID }, JsonRequestBehavior.AllowGet);
         }

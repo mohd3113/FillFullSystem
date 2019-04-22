@@ -6,7 +6,7 @@
 }
 
 <h2>Edit Employee @(Model.FirstName + " " + Model.LastName)</h2>
-
+<hr />
 @using (Html.BeginForm("Edit", "Waiters", FormMethod.Post, new { enctype = "multipart/form-data" }))
 {
     @Html.AntiForgeryToken()
