@@ -179,9 +179,71 @@ namespace FillFull.Controllers
                     }
                 }
             }
-
-
             return PartialView("ReportList", indivisualLists);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult IndivisualReport(ReportsViewmodel reportmodel)
+        {
+
+            IndivisualReportViewModel indivisualReportViewModel = new IndivisualReportViewModel();
+            List<IndivisualList> indivisualLists = new List<IndivisualList>();
+            DateTime start = DateTime.Parse(reportmodel.DateRange2.Split('-')[0]);
+            DateTime end = DateTime.Parse(reportmodel.DateRange2.Split('-')[1]);
+            var waiter = db.Waiters.Include(c=>c.WaiterWorks).SingleOrDefault(p => p.WaiterID == reportmodel.WaiterID);
+            indivisualReportViewModel.ID = waiter.WaiterID;
+            indivisualReportViewModel.Name = waiter.FirstName + " " + waiter.LastName;
+            var waworkmonthly = waiter.WaiterWorks.Where(p => DbFunctions.TruncateTime(p.StartAt) >= DbFunctions.TruncateTime(start)
+            && DbFunctions.TruncateTime(p.StartAt) <= DbFunctions.TruncateTime(end)).ToList();
+            foreach (var item in waworkmonthly)
+            {
+                indivisualLists.Add(new IndivisualList
+                {
+                    Name = item.Waiter.FirstName + " " + item.Waiter.LastName,
+                    TotalHours = item.TotalMin,
+                    TotalBreak = item.WaiterBreaks.Sum(p => (p.EndAt.Value - p.StartAt).TotalMinutes),
+                    StartAt = item.StartAt,
+                    EndAt = item.EndAt.Value,
+                });
+            }
+
+            double watotalbreke = 0;
+
+
+            foreach (var wawo in waworkmonthly)
+            {
+                if (wawo.WaiterBreaks != null)
+                    watotalbreke += wawo.WaiterBreaks.Where(c => c.EndAt != null && c.StartAt.Month != DateTime.Now.Month && c.StartAt.Year != DateTime.Now.Year).Sum(p => (p.EndAt.Value - p.StartAt).TotalMinutes);
+            }
+            var totalminmonthly = waworkmonthly.Sum(p => p.TotalMin);
+            if (waiter.MaxWorkingHours != 0)
+            {
+                if ((totalminmonthly - watotalbreke) > (waiter.MaxWorkingHours * 60))
+                {
+                    var TotalMin = waiter.MaxWorkingHours * 60;
+                    var TotalExtaMin = totalminmonthly - watotalbreke - (waiter.MaxWorkingHours * 60);
+                    var Total_Wage = Convert.ToDecimal(TotalMin / 60) * waiter.Wage;
+                    var ExtraTimeWage = Convert.ToDecimal(TotalExtaMin / 60) * waiter.WageafterMaxHours;
+
+
+                    indivisualReportViewModel.TotalWage = Total_Wage;
+                    indivisualReportViewModel.TotalExtra = TotalExtaMin;
+                    indivisualReportViewModel.TotalHours = TotalMin;
+                    indivisualReportViewModel.TotalExtraWage = ExtraTimeWage;
+
+                }
+                else
+                {
+                    var TotalMin = totalminmonthly - watotalbreke;
+                    var Total_Wage = Convert.ToDecimal(TotalMin / 60) * waiter.Wage;
+
+                    indivisualReportViewModel.TotalWage = Total_Wage;
+                    indivisualReportViewModel.TotalHours = TotalMin;
+                }
+            }
+            indivisualReportViewModel.IndivisualLists = indivisualLists;
+            return PartialView("IndivisualReportList", indivisualReportViewModel);
         }
 
         public ActionResult Contact()
