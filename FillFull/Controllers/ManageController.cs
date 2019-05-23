@@ -7,10 +7,12 @@ using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin.Security;
 using FillFull.Models;
+using FillFull.Services;
 
 namespace FillFull.Controllers
 {
     [Authorize]
+    [AuthorizeIPAddress]
     public class ManageController : Controller
     {
         private ApplicationSignInManager _signInManager;

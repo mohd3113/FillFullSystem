@@ -7,6 +7,7 @@ using System.Net;
 using System.Web;
 using System.Web.Mvc;
 using FillFull.Models;
+using FillFull.Services;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.AspNet.Identity.Owin;
@@ -15,6 +16,7 @@ namespace FillFull.Controllers
 {
 
     [Authorize(Roles = "Manager")]
+    [AuthorizeIPAddress]
     public class AdminsController : Controller
     {
         private FillFullDataContext db = new FillFullDataContext();

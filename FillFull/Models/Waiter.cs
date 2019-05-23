@@ -18,19 +18,14 @@ namespace FillFull.Models
         [Required]
         public string LastName { get; set; }
 
+        [DataType(DataType.EmailAddress)]
+        [Required]
         public string Email { get; set; }
 
         [Display(Name = "Phone Number")]
         public string PhoneNumber { get; set; }
 
         public string Address { get; set; }
-
-        [Display(Name = "Start Time")]
-        [Required]
-        public string StartTime { get; set; }
-
-        [Display(Name = "End Time")]
-        public string EndTime { get; set; }
 
         public string ImagePath { get; set; }
 

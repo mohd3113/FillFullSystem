@@ -30,8 +30,6 @@ namespace FillFull.Migrations
                         Email = c.String(),
                         PhoneNumber = c.String(),
                         Address = c.String(),
-                        StartTime = c.String(nullable: false),
-                        EndTime = c.String(),
                         ImagePath = c.String(),
                         Wage = c.Decimal(nullable: false, precision: 18, scale: 2),
                         MaxWorkingHours = c.Double(nullable: false),

@@ -7,10 +7,12 @@ using System.Web;
 using System.Web.Mvc;
 using FillFull.Models;
 using System.Data.Entity;
+using FillFull.Services;
 
 namespace FillFull.Controllers
 {
     [Authorize]
+    [AuthorizeIPAddress]
     public class HomeController : Controller
     {
         private FillFullDataContext db = new FillFullDataContext();

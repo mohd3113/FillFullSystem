@@ -10,50 +10,61 @@
 <p>
     @Html.ActionLink("Create New", "Create")
 </p>
-<table class="table">
-    <tr>
-        <th>
-            Name
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.Email)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.StartTime)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.EndTime)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.Wage)
-        </th>
-        <th></th>
-    </tr>
-
-    @foreach (var item in Model)
-    {
+<table id="datatables-buttons" class="table table-striped" style="width:100%">
+    <thead>
         <tr>
-            <td>
-                @(item.FirstName + " " + item.LastName)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.PhoneNumber)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.StartTime)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.EndTime)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Wage)
-            </td>
-            <td>
-                @Html.ActionLink("Edit", "Edit", new { id = item.WaiterID }) |
-                @Html.ActionLink("Details", "Details", new { id = item.WaiterID }) |
-                @Html.ActionLink("Delete", "Delete", new { id = item.WaiterID })
-            </td>
+            <th>
+                Name
+            </th>
+            <th>
+                Phone Number
+            </th>
+            <th>
+               Wage
+            </th>
+            <th>
+                Maximum Working Hours
+            </th>
+            <th>
+                Maximum Wage After M.H.
+            </th>
+            <th></th>
         </tr>
-    }
-
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @(item.FirstName + " " + item.LastName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.PhoneNumber)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Wage)
+                </td>
+                <td>
+                    @item.MaxWorkingHours
+                </td>
+                <td>
+                    @item.WageafterMaxHours
+                </td>
+                <td>
+                    @Html.ActionLink("Edit", "Edit", new { id = item.WaiterID }) |
+                    @Html.ActionLink("Details", "Details", new { id = item.WaiterID }) |
+                    @Html.ActionLink("Delete", "Delete", new { id = item.WaiterID })
+                </td>
+            </tr>
+        }
+    </tbody>
 </table>
+<script>
+    document.addEventListener("DOMContentLoaded", function (event) {
+        // Datatables with Buttons
+        var datatablesButtons = $('#datatables-buttons').DataTable({
+            lengthChange: 1,
+            responsive: true
+        });
+    });
+</script>

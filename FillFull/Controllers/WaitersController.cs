@@ -8,13 +8,16 @@ using System.Net;
 using System.Web;
 using System.Web.Mvc;
 using FillFull.Models;
+using FillFull.Services;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.AspNet.Identity.Owin;
 
+
 namespace FillFull.Controllers
 {
 
+    [AuthorizeIPAddress]
     public class WaitersController : Controller
     {
         private FillFullDataContext db = new FillFullDataContext();
